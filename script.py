@@ -32,8 +32,8 @@ orders = tuple(filter(lambda x: perm_parity(list(x)) == 1, itertools.permutation
 
 verts = []
 for sign in signs:
-    for v in vector:
-        for order in orders:
+    for order in orders:
+        for v in vector:
             arr = [float(a*b) for (a, b) in zip([v[i] for i in order], sign)]
             #print(', '.join(['{0:+.5}']*3).format(*arr))
             verts.append(arr)
@@ -50,9 +50,27 @@ for i, vert in enumerate(verts):
     ob.data.align_x = ob.data.align_y = 'CENTER'
 
 
-faces = []
+starts = [0, 15, 30, 45]
+
+faces = [
+  [ 0,  1,  3,  4,  2],
+  [ 1,  0,  8],
+  [ 1,  8,  6],
+  [ 1,  6, 11],
+  [ 1,  11, 3],
+  #[ 5,  6,  8,  9,  7],
+  #[ 10, 11, 13, 14, 12],
+  #[ 15, 16, 18, 19, 17]
+]
+
+faces = [[i, i+1, i+3, i+4, i+2] for i in range(0, 60, 5)]
+
+def fn(a):
+    i = a.index(min(a))
+    return tuple(a[i:] + a[0:i])
+
 me = bpy.data.meshes.new('mesh')
-me.from_pydata(verts, [], faces)
+me.from_pydata(verts, [], list(set(map(fn, faces))))
 
 ob = bpy.data.objects.new('dodec', me)
 scene = bpy.context.scene
